@@ -54,6 +54,8 @@ import {
   BCard, BCardText,
   BIconAt
 } from 'bootstrap-vue'
+import submitSfx from '../assets/blop.mp3'
+// import completeSfx from '../assets/GTA.mp3'
 // import simplebar from 'simplebar-vue'
 // import 'simplebar/dist/simplebar.min.css'
 
@@ -97,6 +99,7 @@ export default {
         username: this.username,
         message: this.message
       }
+      new Audio(submitSfx).play()
       this.chats.push(message)
       this.message = ''
     }
