@@ -1,8 +1,8 @@
 <template>
   <div id="app">
     <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+      <router-link to="/">Sini harusnya navbar</router-link> |
+      <router-link to="/about">kalo selo buat navigasi input pertanyaan</router-link>
     </div>
     <router-view/>
   </div>
