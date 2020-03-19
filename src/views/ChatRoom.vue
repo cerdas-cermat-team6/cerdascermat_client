@@ -111,10 +111,6 @@ export default {
     },
     startGame () {
       this.showNotification('Mulai!')
-      this.dummyFetchQuestions()
-        .then(_ => {
-          this.runGame()
-        })
     },
     runGame (i = 0) {
       this.game.started = true
@@ -163,6 +159,7 @@ export default {
     this.username = localStorage.getItem('username')
     socket.on('userChat', payload => {
       this.addNewChat(payload)
+      console.log(this.chats)
     })
     this.fetchQuestions()
   },

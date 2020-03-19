@@ -36,9 +36,10 @@ export default new Vuex.Store({
         commit('ADD_NEW_CHAT', notif)
       })
     },
-    sendChat (_, payload) {
+    sendChat ({ commit }, payload) {
       // console.log('chat dimasoooking ke server')
       socket.emit('sendChat', payload)
+      commit('ADD_NEW_CHAT', payload)
     }
   },
   getters: {
