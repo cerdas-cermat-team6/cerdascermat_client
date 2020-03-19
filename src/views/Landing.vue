@@ -1,42 +1,95 @@
 <template>
   <div class="landing">
-    <div class="landing-title">
-      <h1>Hi there! Welcome :)</h1>
+    <div class="landing-body">
+      <div class="landing-title">
+        <h1><i>Electric Boogaloo!</i></h1>
+      </div>
+      <div class="landing-loading">
+        <landing-animation></landing-animation>
+      </div>
+      <div class="landing-username">
+        <b-form>
+          <b-form-input v-model="username" style="box-shadow: 2px 2px #3f72af;" type="text" placeholder="insert your username"></b-form-input>
+          <br>
+          <b-button @click.prevent="join" pill variant="primary">Let's play!</b-button>
+        </b-form>
+      </div>
     </div>
-    <div class="landing-loading">
-      <landing-animation></landing-animation>
-    </div>
-    <div class="landing-username">
-      <form>
-        <input type="text" placeholder="username">
-        <button class="btn" @click.prevent >Let's play!</button>
-      </form>
-    </div>
+    <a id="vecteezy" href="https://www.vecteezy.com/free-vector/pattern">Pattern Vectors by Vecteezy</a>
   </div>
 </template>
 
 <script>
 import LandingAnimation from '../components/LandingAnimation'
+import { BButton, BForm, BFormInput } from 'bootstrap-vue'
 
 export default {
-  components: {
-    LandingAnimation
+  data () {
+    return {
+      username: ''
+    }
   },
-  created () {
-    this.$store.dispatch('fetchQuestions')
+  components: {
+    LandingAnimation,
+    BButton,
+    BForm,
+    BFormInput
+  },
+  methods: {
+    join () {
+      localStorage.setItem('username', this.username)
+      this.$router.push('/quiz')
+    }
   }
 }
 </script>
 
 <style scoped>
+h1{
+  color: #112d4e;
+  font-weight: bold;
+}
 .landing{
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-image: url('../assets/background.png');
 }
-form{
+.landing a{
+  bottom: 0;
+  right: 0;
+  position: fixed;
+  font-size: 8px;
+}
+.landing-body{
+  border: 5px #112d4e solid;
+  width: fit-content;
+  height: fit-content;
+  padding: 15px;
+  border-radius: 15px;
+  background-color: #dbe2ef;
+}
+b-form{
   display: flex;
   flex-direction: column;
-  width: 15%;
   margin: auto;
+}
+button{
+  width: 50%;
+  background-color: #3f72af;
+  color: white;
+  font-weight: bold;
+}
+button:hover{
+  background-color: #112d4e;
+}
+.landing{
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  height: calc(100vh - 4rem);
+}
+.landing-title{
+  margin-top: 10%;
 }
 </style>
