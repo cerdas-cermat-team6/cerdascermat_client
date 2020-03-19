@@ -5,9 +5,9 @@
         <h4><i>Eat Bulaga: <br>Electric Boogaloo</i></h4>
         <b-form class="border rounded p-2" @submit.prevent="onSubmit">
           <b-form-group label="Username:" description="your gamer tag" >
-            <b-form-input v-model="username" disabled type="text" required placeholder="username" ></b-form-input>
+            <b-form-input v-model="username" disabled type="text" ></b-form-input>
           </b-form-group>
-          <b-form-group label="Message:" description="your gamer screams" >
+          <b-form-group label="Message:" description="your gamer cry" >
             <b-form-input v-model="message" type="text" required placeholder="message" ></b-form-input>
           </b-form-group>
           <b-button class="nav-button" type="submit" pill variant="primary">Submit</b-button>
@@ -64,19 +64,16 @@ import {
   BIconAt
 } from 'bootstrap-vue'
 import submitSfx from '../assets/blop.mp3'
+import socket from '../config/socket.js'
+import { mapActions, mapState, mapMutations } from 'vuex'
+
 export default {
   data () {
     return {
-      chats: [],
       username: '',
       message: '',
-      questions: [],
       currentQuestions: {},
-      questionTime: 1000,
-      game: {
-        started: false,
-        poin: 0
-      }
+      questionTime: 1000
     }
   },
   components: {
@@ -96,8 +93,6 @@ export default {
         message: this.message,
         type: 'chat'
       }
-      new Audio(submitSfx).play()
-      this.chats.push(message)
       if (this.message === '!join' && !this.game.started) {
         this.startGame()
       }
@@ -105,9 +100,13 @@ export default {
         if (this.currentQuestions.answer.includes(this.message)) {
           this.game.poin += 1
           this.currentQuestions.answer.splice(this.currentQuestions.answer.indexOf(this.message), 1)
+          // play audio betol
           console.log('betol!')
         }
       }
+      // ganti emit ke socket server
+      this.sendChat(message)
+      new Audio(submitSfx).play()
       this.message = ''
     },
     startGame () {
@@ -119,14 +118,13 @@ export default {
     },
     runGame (i = 0) {
       this.game.started = true
-      if (i === this.questions.length) {
+      if (i === 5) {
         this.showNotification('Game Over!')
         this.showNotification(`Poinmu ${this.game.poin}`)
         this.game.started = false
         this.game.poin = 0
       } else {
-        const item = this.questions[i]
-        this.showQuestion(item)
+        this.showQuestion(this.$store.getters.randQuestion)
         setTimeout(() => {
           this.runGame(i + 1)
         }, this.questionTime)
@@ -149,39 +147,30 @@ export default {
       }
       this.chats.push(payload)
     },
-    dummyFetchQuestions () {
-      this.emptyQuestions()
-      for (let i = 0; i < 10; i++) {
-        this.questions.push(
-          {
-            id: i + 1,
-            question: `${i + 1}Apa yang suka orang lakukan ketika hujan?`,
-            answer: [
-              'makan mie',
-              'minum kopi',
-              '*****',
-              'tidur',
-              'melamun'
-            ]
-          }
-        )
-      }
-      return new Promise((resolve, reject) => {
-        setTimeout(() => {
-          resolve(1)
-        }, 1000)
-      })
-    },
-    emptyQuestions () {
-      this.questions = []
-    },
     logout () {
       localStorage.clear()
       this.$router.replace('/')
-    }
+    },
+    ...mapActions({
+      sendChat: 'sendChat',
+      fetchQuestions: 'fetchQuestions'
+    }),
+    ...mapMutations({
+      addNewChat: 'ADD_NEW_CHAT'
+    })
   },
   created () {
     this.username = localStorage.getItem('username')
+    socket.on('userChat', payload => {
+      this.addNewChat(payload)
+    })
+    this.fetchQuestions()
+  },
+  computed: {
+    ...mapState({
+      chats: state => state.chats,
+      game: state => state.game
+    })
   }
 }
 </script>

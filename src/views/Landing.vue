@@ -23,6 +23,7 @@
 import LandingAnimation from '../components/LandingAnimation'
 import join from '../assets/join.mp3'
 import { BButton, BForm, BFormInput } from 'bootstrap-vue'
+
 export default {
   data () {
     return {
@@ -37,12 +38,12 @@ export default {
   },
   methods: {
     join () {
+      console.log('masoook', this.username)
       localStorage.setItem('username', this.username)
       this.$router.push('/quiz')
       new Audio(join).play()
     }
   }
-
 }
 </script>
 
