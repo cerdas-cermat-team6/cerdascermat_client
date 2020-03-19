@@ -1,21 +1,22 @@
 <template>
-  <div class="container-fluid">
-    <h4>Eat Bulaga: Electric Boogaloo</h4>
+  <div class="container-fluid vh-100 chat-room">
     <div class="row">
-      <div class="col-md-3 p-3">
+      <div class="col-md-3 p-3" id="navigation-panel">
+        <h4>Eat Bulaga: Electric Boogaloo</h4>
         <b-form class="border rounded p-2" @submit.prevent="onSubmit">
           <b-form-group label="Username:" description="your gamer tag" >
-            <b-form-input v-model="username" type="text" required placeholder="Username" ></b-form-input>
+            <b-form-input v-model="username" disabled type="text" required placeholder="username" ></b-form-input>
           </b-form-group>
           <b-form-group label="Message:" description="your gamer screams" >
-            <b-form-input v-model="message" type="text" required placeholder="Username" ></b-form-input>
+            <b-form-input v-model="message" type="text" required placeholder="message" ></b-form-input>
           </b-form-group>
-          <b-button type="submit" variant="primary">Submit</b-button>
+          <b-button class="nav-button" type="submit" pill variant="primary">Submit</b-button>
+          <b-button class="nav-button" @click.prevent="logout" pill variant="danger">Logout</b-button>
         </b-form>
       </div>
       <div class="col-md-9 p-3">
         <b-card header="!join to start quiz" bg-variant="light" class="text-center">
-          <div class="overflow-auto" style="height:400px" v-chat-scroll>
+          <div class="overflow-auto" v-chat-scroll>
             <!-- chat -->
             <div v-for="(item,i) in chats" :key="i" class="d-flex border rounded mb-1">
               <div v-if="item.type==='chat'" class="d-flex p-1">
@@ -188,7 +189,33 @@ export default {
     },
     emptyQuestions () {
       this.questions = []
+    },
+    logout () {
+      localStorage.clear()
+      this.$router.replace('/')
     }
+  },
+  created () {
+    this.username = localStorage.getItem('username')
   }
 }
 </script>
+
+<style scoped>
+.chat-room {
+}
+.nav-button {
+  width: 80%;
+  margin-top: 5%;
+}
+.row{
+  height: 100%;
+}
+.overflow-auto{
+  height: 80vh;
+}
+#navigation-panel{
+  margin-top: 25vh;
+  margin-bottom: 25vh;
+}
+</style>
