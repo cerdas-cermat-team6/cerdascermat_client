@@ -17,11 +17,14 @@
 
 <script>
 import LandingAnimation from '../components/LandingAnimation'
+
 export default {
   components: {
     LandingAnimation
+  },
+  created () {
+    this.$store.dispatch('fetchQuestions')
   }
-
 }
 </script>
 
