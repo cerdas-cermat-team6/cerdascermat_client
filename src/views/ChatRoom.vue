@@ -1,7 +1,7 @@
 <template>
   <div class="container-fluid vh-100 chat-room">
     <div class="row">
-      <div class="col-md-3 p-3" id="navigation-panel">
+      <div class="col-md-3 col-sm-3 p-3" id="navigation-panel">
         <h4><i>Eat Bulaga: <br>Electric Boogaloo</i></h4>
         <b-form class="border rounded p-2" @submit.prevent="onSubmit">
           <b-form-group label="Username:" description="your gamer tag" >
@@ -14,8 +14,8 @@
           <b-button class="nav-button" @click.prevent="logout" pill variant="danger">Logout</b-button>
         </b-form>
       </div>
-      <div class="col-md-9 p-3">
-        <b-card header="!join to start quiz" bg-variant="light" class="text-center">
+      <div class="col-md-7 col-sm-7 p-3">
+        <b-card header="!start to start quiz" bg-variant="light" class="text-center">
           <div class="overflow-auto" v-chat-scroll>
             <!-- chat -->
             <div v-for="(item,i) in chats" :key="i" class="d-flex border rounded mb-1">
@@ -35,7 +35,6 @@
                 <div>
                   <b-card-text>
                     <p class="text-break m-0 font-weight-bold">{{ item.message }}</p>
-                    <p class="m-0" v-for="(notif, i) in item.items" :key="i">{{ notif.text }}: {{ notif.val }} poin</p>
                   </b-card-text>
                 </div>
               </div>
@@ -52,6 +51,10 @@
           </div>
         </b-card>
       </div>
+      <div class="col-md-2 col-sm-2 p-3 bg-light">
+        <b-table striped hover :items="klasemen">
+        </b-table>
+      </div>
     </div>
     <a id="vecteezy" href="https://www.vecteezy.com/free-vector/pattern">Pattern Vectors by Vecteezy</a>
   </div>
@@ -61,19 +64,18 @@
 import {
   BForm, BFormGroup, BButton, BFormInput,
   BCard, BCardText,
-  BIconAt
+  BIconAt,
+  BTable
 } from 'bootstrap-vue'
 import submitSfx from '../assets/blop.mp3'
 import socket from '../config/socket.js'
-import { mapActions, mapState, mapMutations } from 'vuex'
+import { mapActions, mapState, mapMutations, mapGetters } from 'vuex'
+import store from '../store'
 
 export default {
   data () {
     return {
-      username: '',
-      message: '',
-      currentQuestions: {},
-      questionTime: 1000
+      message: ''
     }
   },
   components: {
@@ -83,48 +85,36 @@ export default {
     BFormInput,
     BCard,
     BCardText,
-    BIconAt
+    BIconAt,
+    BTable
   },
   methods: {
     onSubmit () {
       console.log('masoook')
-      const message = {
+      const payload = {
         username: this.username,
         message: this.message,
         type: 'chat'
       }
-      if (this.message === '!join' && !this.game.started) {
-        this.startGame()
-      }
       if (this.game.started) {
-        if (this.currentQuestions.answer.includes(this.message)) {
-          this.game.poin += 1
-          this.currentQuestions.answer.splice(this.currentQuestions.answer.indexOf(this.message), 1)
-          // play audio betol
-          console.log('betol!')
+        console.log(payload.message, 'apaan toh')
+        if (this.answerIsCorrect(payload.message)) {
+          this.addOnePoint()
+          this.pickAnswer()
         }
       }
-      // ganti emit ke socket server
-      this.sendChat(message)
+      if (payload.message === '!start' && !this.game.started) {
+        console.log('maen game cok')
+        this.startGame()
+        this.printQuestion()
+      }
+      if (payload.message === '!stop' && !this.game.started) {
+        console.log('game trooos')
+        this.stopGame()
+      }
+      this.sendChat(payload)
       new Audio(submitSfx).play()
       this.message = ''
-    },
-    startGame () {
-      this.showNotification('Mulai!')
-    },
-    runGame (i = 0) {
-      this.game.started = true
-      if (i === 5) {
-        this.showNotification('Game Over!')
-        this.showNotification(`Poinmu ${this.game.poin}`)
-        this.game.started = false
-        this.game.poin = 0
-      } else {
-        this.showQuestion(this.$store.getters.randQuestion)
-        setTimeout(() => {
-          this.runGame(i + 1)
-        }, this.questionTime)
-      }
     },
     showQuestion (dbQuestion) {
       // socket receive notification from server
@@ -134,7 +124,6 @@ export default {
       }
       this.chats.push(payload)
       this.currentQuestions = { ...dbQuestion }
-      // console.log(this.currentQuestions)
     },
     showNotification (msg) {
       const payload = {
@@ -152,24 +141,50 @@ export default {
       fetchQuestions: 'fetchQuestions'
     }),
     ...mapMutations({
-      addNewChat: 'ADD_NEW_CHAT'
+      addNewChat: 'ADD_NEW_CHAT',
+      startGame: 'START_GAME',
+      stopGame: 'STOP_GAME',
+      printQuestion: 'PRINT_QUESTION',
+      setUsername: 'SET_USERNAME',
+      pickAnswer: 'PICK_ANSWER',
+      addOnePoint: 'ADD_ONE_POINT'
     })
   },
   created () {
-    this.username = localStorage.getItem('username')
+    const name = localStorage.getItem('username')
+    this.setUsername(name)
     socket.on('userChat', payload => {
       this.addNewChat(payload)
-      console.log(this.chats)
     })
-    this.fetchQuestions()
   },
   computed: {
     ...mapState({
       chats: state => state.chats,
-      game: state => state.game
+      game: state => state.game,
+      question: state => state.question,
+      username: state => state.username,
+      klasemen: state => state.klasemen
+    }),
+    ...mapGetters({
+      answerIsCorrect: 'answerIsCorrect'
     })
   }
 }
+
+socket.on('feedQuestion', payload => {
+  // itung poin dan kasih feed poin di sini
+  store.commit('SET_QUESTION', payload)
+  if (store.state.game.started) {
+    store.commit('PRINT_USER_POINT')
+    store.dispatch('sendPoint')
+    store.commit('PRINT_QUESTION')
+  }
+  // console.log(store.state.question)
+})
+socket.on('addUserPoint', payload => {
+  console.log(payload)
+  store.commit('FEED_LEADERBOARD', payload)
+})
 </script>
 
 <style scoped>
