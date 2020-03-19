@@ -2,7 +2,7 @@
   <div class="container-fluid vh-100 chat-room">
     <div class="row">
       <div class="col-md-3 p-3" id="navigation-panel">
-        <h4>Eat Bulaga: Electric Boogaloo</h4>
+        <h4><i>Eat Bulaga: <br>Electric Boogaloo</i></h4>
         <b-form class="border rounded p-2" @submit.prevent="onSubmit">
           <b-form-group label="Username:" description="your gamer tag" >
             <b-form-input v-model="username" disabled type="text" required placeholder="username" ></b-form-input>
@@ -53,6 +53,7 @@
         </b-card>
       </div>
     </div>
+    <a id="vecteezy" href="https://www.vecteezy.com/free-vector/pattern">Pattern Vectors by Vecteezy</a>
   </div>
 </template>
 
@@ -66,23 +67,7 @@ import submitSfx from '../assets/blop.mp3'
 export default {
   data () {
     return {
-      chats: [
-        { username: 'lele1', message: 'test01', type: 'chat' },
-        { username: 'lele1', message: 'test01', type: 'chat' },
-        {
-          message: 'Server notification',
-          type: 'notification',
-          items: [
-            { text: 'bambang', val: '10' },
-            { text: 'bambang', val: '10' },
-            { text: 'bambang', val: '10' },
-            { text: 'bambang', val: '10' }
-          ]
-        },
-        { username: 'lele1', message: 'test01', type: 'chat' },
-        { username: 'lele1', message: 'test01', type: 'chat' },
-        { message: 'Berapa kali harus kukatakan?', type: 'question' }
-      ],
+      chats: [],
       username: '',
       message: '',
       questions: [],
@@ -203,10 +188,19 @@ export default {
 
 <style scoped>
 .chat-room {
+  background-image: url('../assets/background.png');
+}
+.chat-room a{
+  bottom: 0;
+  right: 0;
+  position: fixed;
+  font-size: 8px;
 }
 .nav-button {
   width: 80%;
   margin-top: 5%;
+  color: #f9f7f7;
+  font-weight: bold;
 }
 .row{
   height: 100%;
@@ -217,5 +211,10 @@ export default {
 #navigation-panel{
   margin-top: 25vh;
   margin-bottom: 25vh;
+  background-color: white;
+}
+#navigation-panel h4{
+  font-weight: bold;
+  color: #112d4e;
 }
 </style>
