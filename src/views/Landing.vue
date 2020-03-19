@@ -8,10 +8,10 @@
         <landing-animation></landing-animation>
       </div>
       <div class="landing-username">
-        <b-form>
-          <b-form-input v-model="username" style="box-shadow: 2px 2px #3f72af;" type="text" placeholder="insert your username"></b-form-input>
+        <b-form @submit.prevent="join">
+          <b-form-input v-model="username" required id="username-input" style="box-shadow: 2px 2px #3f72af;" type="text" placeholder="insert your username"></b-form-input>
           <br>
-          <b-button @click.prevent="join" pill variant="primary">Let's play!</b-button>
+          <b-button type="submit" pill variant="primary">Let's play!</b-button>
         </b-form>
       </div>
     </div>
@@ -21,6 +21,7 @@
 
 <script>
 import LandingAnimation from '../components/LandingAnimation'
+import join from '../assets/join.mp3'
 import { BButton, BForm, BFormInput } from 'bootstrap-vue'
 
 export default {
@@ -40,6 +41,7 @@ export default {
       console.log('masoook', this.username)
       localStorage.setItem('username', this.username)
       this.$router.push('/quiz')
+      new Audio(join).play()
     }
   }
 }
@@ -75,6 +77,9 @@ b-form{
   display: flex;
   flex-direction: column;
   margin: auto;
+}
+#username-input::placeholder{
+  color: #3f72af;
 }
 button{
   width: 50%;
