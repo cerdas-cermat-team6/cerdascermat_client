@@ -22,6 +22,7 @@
 <script>
 import LandingAnimation from '../components/LandingAnimation'
 import { BButton, BForm, BFormInput } from 'bootstrap-vue'
+
 export default {
   data () {
     return {
@@ -40,7 +41,6 @@ export default {
       this.$router.push('/quiz')
     }
   }
-
 }
 </script>
 
