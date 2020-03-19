@@ -8,10 +8,10 @@
         <landing-animation></landing-animation>
       </div>
       <div class="landing-username">
-        <b-form>
-          <b-form-input v-model="username" id="username-input" style="box-shadow: 2px 2px #3f72af;" type="text" placeholder="insert your username"></b-form-input>
+        <b-form @submit.prevent="join">
+          <b-form-input v-model="username" required id="username-input" style="box-shadow: 2px 2px #3f72af;" type="text" placeholder="insert your username"></b-form-input>
           <br>
-          <b-button @click.prevent="join" pill variant="primary">Let's play!</b-button>
+          <b-button type="submit" pill variant="primary">Let's play!</b-button>
         </b-form>
       </div>
     </div>
