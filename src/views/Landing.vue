@@ -37,6 +37,7 @@ export default {
   },
   methods: {
     join () {
+      console.log('masoook', this.username)
       localStorage.setItem('username', this.username)
       this.$router.push('/quiz')
     }
