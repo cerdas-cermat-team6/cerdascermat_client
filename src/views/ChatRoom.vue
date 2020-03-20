@@ -108,7 +108,7 @@ export default {
         this.startGame()
         this.printQuestion()
       }
-      if (payload.message === '!stop' && !this.game.started) {
+      if (payload.message === '!stop' && this.game.started) {
         console.log('game trooos')
         this.stopGame()
       }
@@ -174,7 +174,7 @@ export default {
 socket.on('feedQuestion', payload => {
   // itung poin dan kasih feed poin di sini
   store.commit('SET_QUESTION', payload)
-  if (store.state.game.started) {
+  if (store.getters.gameStatus) {
     store.commit('PRINT_USER_POINT')
     store.dispatch('sendPoint')
     store.commit('PRINT_QUESTION')
