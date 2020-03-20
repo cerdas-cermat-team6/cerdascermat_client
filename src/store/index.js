@@ -98,6 +98,12 @@ export default new Vuex.Store({
       }
       socket.emit('broadcastPoint', payload)
       commit('RESET_POINT')
+    },
+    fetchQuestions ({ commit }) {
+      socket.emit('fetchQuestions')
+      socket.on('questions', payload => {
+        console.log(payload, '<<<<<<<<<')
+      })
     }
   },
   getters: {
