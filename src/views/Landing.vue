@@ -43,6 +43,9 @@ export default {
       this.$router.push('/quiz')
       new Audio(join).play()
     }
+  },
+  created () {
+    this.$store.dispatch('fetchQuestions')
   }
 }
 </script>
