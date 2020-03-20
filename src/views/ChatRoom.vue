@@ -103,14 +103,33 @@ export default {
           this.pickAnswer()
         }
       }
-      if (payload.message === '!start' && !this.game.started) {
+      if (this.competition.started && this.competition_question.question) {
+        if (this.competitionAnswerIsCorrect(payload.message)) {
+          this.competitionPoint()
+          this.pickCompetitionAnswer()
+        }
+      }
+
+      // tidak bisa game kalau compete started
+      if (payload.message === '!start' && !this.game.started && !this.competition.started) {
         console.log('maen game cok')
         this.startGame()
         this.printQuestion()
       }
+
+      // tidak bisa compete kalau game stareted
+      if (payload.message === '!compete' && !this.competition.started && !this.game.started) {
+        // emit server suruh ngirim fetch quest
+        // start competition
+        socket.emit('competitionRequest')
+      }
       if (payload.message === '!stop' && this.game.started) {
         console.log('game trooos')
         this.stopGame()
+      }
+      if (payload.message === '!exit' && this.competition.started) {
+        this.stopCompetition()
+        socket.emit('competitionExit')
       }
       this.sendChat(payload)
       new Audio(submitSfx).play()
@@ -147,12 +166,16 @@ export default {
       printQuestion: 'PRINT_QUESTION',
       setUsername: 'SET_USERNAME',
       pickAnswer: 'PICK_ANSWER',
-      addOnePoint: 'ADD_ONE_POINT'
+      addOnePoint: 'ADD_ONE_POINT',
+      stopCompetition: 'STOP_COMPETITION',
+      competitionPoint: 'COMPETITION_POINT',
+      pickCompetitionAnswer: 'PICK_COMPETITION_ANSWER'
     })
   },
   created () {
     const name = localStorage.getItem('username')
     this.setUsername(name)
+    this.fetchQuestions()
     socket.on('userChat', payload => {
       this.addNewChat(payload)
     })
@@ -163,10 +186,13 @@ export default {
       game: state => state.game,
       question: state => state.question,
       username: state => state.username,
-      klasemen: state => state.klasemen
+      klasemen: state => state.klasemen,
+      competition: state => state.competition,
+      competition_question: state => state.competition_question
     }),
     ...mapGetters({
-      answerIsCorrect: 'answerIsCorrect'
+      answerIsCorrect: 'answerIsCorrect',
+      competitionAnswerIsCorrect: 'competitionAnswerIsCorrect'
     })
   }
 }
@@ -182,8 +208,20 @@ socket.on('feedQuestion', payload => {
   // console.log(store.state.question)
 })
 socket.on('addUserPoint', payload => {
-  console.log(payload)
+  // console.log(payload)
   store.commit('FEED_LEADERBOARD', payload)
+})
+socket.on('competitionStarted', _ => {
+  // competition started
+  console.log('competition started')
+  store.commit('START_COMPETITION')
+  // cetak pertanyaan dari questions
+  store.dispatch('printQuestionInRandom')
+})
+socket.on('competitionEnded', _ => {
+  if (store.getters.competitionStatus) {
+    store.commit('STOP_COMPETITION')
+  }
 })
 </script>
 
