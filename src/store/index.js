@@ -58,19 +58,19 @@ export default new Vuex.Store({
       state.question.answers.splice(state.question.answers.indexOf(answer), 1)
     },
     FEED_LEADERBOARD (state, payload) {
+      let id
       state.klasemen.forEach((item, i) => {
-        let id
         if (item.username === payload.username) {
           id = i
         }
-        if (id === undefined) {
-          if (payload.poin > 0) {
-            state.klasemen.push(payload)
-          }
-        } else {
-          state.klasemen[id].poin += payload.poin
-        }
       })
+      if (id === undefined) {
+        if (payload.poin > 0) {
+          state.klasemen.push(payload)
+        }
+      } else {
+        state.klasemen[id].poin += payload.poin
+      }
     }
   },
   actions: {
@@ -107,6 +107,9 @@ export default new Vuex.Store({
     },
     answerIsCorrect: state => answer => {
       return state.question.answers.includes(answer)
+    },
+    gameStatus: state => {
+      return state.game.started
     }
   }
 })
